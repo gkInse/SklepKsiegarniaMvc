@@ -6,10 +6,12 @@ namespace SklepKsiegarniaMvcUI.Controllers
     public class CartController : Controller
     {
         private readonly ICartRepository _cartRepo;
+        private readonly IUserOrderRepository _userOrderRepo;
 
-        public CartController(ICartRepository cartRepo)
+        public CartController(ICartRepository cartRepo, IUserOrderRepository userOrderRepo)
         {
             _cartRepo = cartRepo;
+            _userOrderRepo = userOrderRepo;
         }
         public async Task<IActionResult> AddItem(int bookId, int qty = 1, int redirect = 0)
         {
@@ -42,6 +44,30 @@ namespace SklepKsiegarniaMvcUI.Controllers
             if (!isCheckedOut)
                 throw new Exception("Error in server side");
             return RedirectToAction("Index", "Home");
+        }
+
+        public async Task<IActionResult> RepeatOrder(int orderId)
+        {
+            try
+            {
+                var order = await _userOrderRepo.GetOrderById(orderId);
+
+                if (order == null)
+                    return NotFound(); 
+
+                foreach (var orderDetail in order.OrderDetail)
+                {
+                    await _cartRepo.AddItem(orderDetail.BookId, orderDetail.Quantity);
+                }
+
+
+                return RedirectToAction("GetUserCart", "Cart");
+            }
+            catch (Exception ex)
+            {
+
+                return RedirectToAction("Error", "Home"); 
+            }
         }
 
     }

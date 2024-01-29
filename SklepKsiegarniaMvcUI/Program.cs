@@ -1,7 +1,8 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using SklepKsiegarniaMvcUI;
-
+using SklepKsiegarniaMvcUI.Services;
+using NuGet.Protocol;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,10 +17,20 @@ builder.Services
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultUI()
     .AddDefaultTokenProviders();
+builder.Services.Configure<DataProtectionTokenProviderOptions>(options =>
+{
+    options.TokenLifespan = TimeSpan.FromMinutes(5);
+});
+builder.Services.AddTransient<IEmailSender, EmailSender>();
 builder.Services.AddControllersWithViews();
 builder.Services.AddTransient<IHomeRepository,HomeRepository>();
 builder.Services.AddTransient<ICartRepository,CartRepository>();
 builder.Services.AddTransient<IUserOrderRepository,UserOrderRepository>();
+
+builder.Services.AddSession();
+
+
+
 var app = builder.Build();
 //using(var scope = app.Services.CreateScope())
 //{
@@ -45,6 +56,8 @@ app.UseStaticFiles();
 app.UseRouting();
 
 app.UseAuthorization();
+
+app.UseSession();
 
 app.MapControllerRoute(
     name: "default",

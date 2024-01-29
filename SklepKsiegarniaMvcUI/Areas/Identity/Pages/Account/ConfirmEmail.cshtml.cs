@@ -17,10 +17,14 @@ namespace SklepKsiegarniaMvcUI.Areas.Identity.Pages.Account
     public class ConfirmEmailModel : PageModel
     {
         private readonly UserManager<IdentityUser> _userManager;
+        private readonly SignInManager<IdentityUser> _signInManager;
+        private readonly ILogger<ConfirmEmailModel> _logger;
 
-        public ConfirmEmailModel(UserManager<IdentityUser> userManager)
+        public ConfirmEmailModel(UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager, ILogger<ConfirmEmailModel> logger)
         {
             _userManager = userManager;
+            _signInManager = signInManager;
+            _logger = logger;
         }
 
         /// <summary>
@@ -39,12 +43,32 @@ namespace SklepKsiegarniaMvcUI.Areas.Identity.Pages.Account
             var user = await _userManager.FindByIdAsync(userId);
             if (user == null)
             {
+                _logger.LogWarning($"User ID '{userId}' not found.");
                 return NotFound($"Unable to load user with ID '{userId}'.");
             }
 
             code = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(code));
             var result = await _userManager.ConfirmEmailAsync(user, code);
-            StatusMessage = result.Succeeded ? "Thank you for confirming your email." : "Error confirming your email.";
+
+            if (result.Succeeded)
+            {
+                
+                await _userManager.AddToRoleAsync(user, "User");
+
+                // Update security stamp and refresh sign-in session
+                await _userManager.UpdateSecurityStampAsync(user);
+                await _signInManager.RefreshSignInAsync(user);
+
+                StatusMessage = "Dziekujemy za potwierdzenie maila.";
+            }
+
+            else
+            {
+                StatusMessage = "Błąd przy potwierdzeniu email.";
+            }
+
+
+
             return Page();
         }
     }

@@ -39,5 +39,22 @@ namespace SklepKsiegarniaMvcUI.Repositories
             string userId = _userManager.GetUserId(principal);
             return userId;
         }
+
+        public async Task<Order> GetOrderById(int orderId)
+        {
+            var userId = GetUserId();
+            if (string.IsNullOrEmpty(userId))
+                throw new Exception("User is not logged-in");
+
+            var order = await _db.Orders
+                            .Include(x => x.OrderStatus)
+                            .Include(x => x.OrderDetail)
+                            .ThenInclude(x => x.Book)
+                            .ThenInclude(x => x.Genre)
+                            .FirstOrDefaultAsync(a => a.UserId == userId && a.Id == orderId);
+
+            return order;
+        }
+
     }
 }

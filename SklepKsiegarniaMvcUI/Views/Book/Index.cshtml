@@ -1,0 +1,56 @@
+﻿@model IEnumerable<SklepKsiegarniaMvcUI.Models.Book>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Lista Książek</h1>
+
+<p>
+    <a asp-action="Create">Dodaj nową książkę</a>
+</p>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Nazwa książki</th>
+            <th>Autor</th>
+            <th>Cena</th>
+            <th>Data wydania</th>
+            <th>Typ okładki</th>
+            <th>Opis</th>
+            <th>Okładka</th>
+            <th>Gatunek</th>
+            <th>Akcje</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@Html.DisplayFor(modelItem => item.BookName)</td>
+                <td>@Html.DisplayFor(modelItem => item.AuthorName)</td>
+                <td>@Html.DisplayFor(modelItem => item.Price)</td>
+                <td>@Html.DisplayFor(modelItem => item.ReleaseDate)</td>
+                <td>@Html.DisplayFor(modelItem => item.CoverType)</td>
+                <td>@Html.DisplayFor(modelItem => item.Description)</td>
+                <td>
+                    @if (!string.IsNullOrEmpty(item.Image))
+                    {
+                        <img src="/images/@item.Image" alt="Okładka książki" style="max-width: 50px; max-height: 100px;" />
+                    }
+                    else
+                    {
+                        <img src="~/images/NoImage.png" alt="Brak dostępnej okładki" style="max-width: 50px; max-height: 100px;" />
+                    }
+                </td>
+                <td>@Html.DisplayFor(modelItem => item.Genre.GenreName)</td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.Id">Edytuj</a> |
+                    <a asp-action="Details" asp-route-id="@item.Id">Szczegóły</a> |
+                    <a asp-action="Delete" asp-route-id="@item.Id">Usuń</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

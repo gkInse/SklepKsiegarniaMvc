@@ -1,7 +1,4 @@
-﻿
-
-
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 
 namespace SklepKsiegarniaMvcUI.Repositories
 {
@@ -19,29 +16,57 @@ namespace SklepKsiegarniaMvcUI.Repositories
             return await _db.Genres.ToListAsync();
         }
 
-        public async Task<IEnumerable<Book>> GetBooks(string sTerm="",int genreId = 0)
+        public IEnumerable<Book> SearchBooks(string searchTerm)
         {
-            sTerm=sTerm.ToLower();
-            IEnumerable<Book> books = await (from book in _db.Books
-                         join genre in _db.Genres
-                         on book.GenreId equals genre.Id
-                         where string.IsNullOrWhiteSpace(sTerm) || (book!=null && book.BookName.ToLower().StartsWith(sTerm))
-                         select new Book
-                         {
-                             Id = book.Id,
-                             Image = book.Image,
-                             AuthorName = book.AuthorName,
-                             BookName = book.BookName,
-                             GenreId = book.GenreId,
-                             Price = book.Price,
-                             GenreName = genre.GenreName
-                         }
-                         ).ToListAsync();
-            if(genreId > 0 )
+            var query = _db.Books
+                .Include(b => b.Genre)
+                .AsQueryable();
+
+            if (!string.IsNullOrEmpty(searchTerm))
             {
-                books= books.Where(a => a.GenreId == genreId).ToList();
+                var searchTerms = searchTerm.Split(',').Select(term => term.Trim().ToLower()).ToArray();
+
+                // Pobierz dane z bazy danych do pamięci
+                var booksInMemory = query.ToList();
+
+                var filteredBooks = booksInMemory
+                    .Where(book =>
+                        searchTerms.All(searchTerm =>
+                            (book.BookName != null && book.BookName.ToLower().Contains(searchTerm)) ||
+                            (book.AuthorName != null && book.AuthorName.ToLower().Contains(searchTerm)) ||
+                            (book.Genre != null && book.Genre.GenreName.ToLower().Contains(searchTerm)) ||
+                            (book.Price.ToString() != null && book.Price.ToString().ToLower().Contains(searchTerm)) ||
+                            (book.ReleaseDate.ToString("M/d/yyyy") != null && book.ReleaseDate.ToString("M/d/yyyy").ToLower().Contains(searchTerm)) ||
+                            (book.CoverType.ToString() != null && book.CoverType.ToString().ToLower().Contains(searchTerm))
+                        )
+                    )
+                    .AsQueryable();
+
+                // Zaktualizuj oryginalne zapytanie
+                query = filteredBooks.AsQueryable();
             }
-            return books;
+
+            return query.ToList();
+        }
+
+        public async Task<IEnumerable<Book>> GetBooks(string sTerm = "", int genreId = 0)
+        {
+            sTerm = sTerm.ToLower();
+
+            var query = _db.Books.Include(b => b.Genre)
+                            .Where(book =>
+                                (string.IsNullOrEmpty(sTerm) ||
+                                book.BookName.ToLower().Contains(sTerm) ||
+                                book.AuthorName.ToLower().Contains(sTerm)) &&
+                                (genreId == 0 || book.GenreId == genreId));
+
+            return await query.ToListAsync();
+        }
+
+        public async Task<Book> GetBookById(int id)
+        {
+            return await _db.Books.Include(b => b.Genre)
+                                   .FirstOrDefaultAsync(b => b.Id == id);
         }
     }
 }

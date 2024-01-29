@@ -1,0 +1,34 @@
+﻿@model List<SklepKsiegarniaMvcUI.Models.TopProducts>
+
+<h2>Top 10 Najczęściej Kupowanych Produktów</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Pozycja</th>
+            <th>Nazwa Produktu</th>
+            <th>Zdjęcie</th>
+            <th>Ilość</th>
+        </tr>
+    </thead>
+    <tbody>
+        @for (var i = 0; i < Model.Count; i++)
+        {
+            <tr>
+                <td>@(i + 1)</td>
+                <td>@Model[i].Product.BookName</td>
+                <td>
+                    @if (!string.IsNullOrEmpty(Model[i].Product.Image))
+                    {
+                        <img src="/images/@Model[i].Product.Image" alt="@Model[i].Product.BookName" style="max-width: 50px; max-height: 100px;">
+                    }
+                    else
+                    {
+                        <img src="~/images/NoImage.png" alt="Brak obrazu" style="max-width: 50px; max-height: 100px;">
+                    }
+                </td>
+                <td>@Model[i].Quantity</td>
+            </tr>
+        }
+    </tbody>
+</table>

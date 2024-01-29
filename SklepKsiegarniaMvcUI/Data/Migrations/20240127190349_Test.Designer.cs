@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SklepKsiegarniaMvcUI.Data;
 
@@ -11,9 +12,11 @@ using SklepKsiegarniaMvcUI.Data;
 namespace SklepKsiegarniaMvcUI.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240127190349_Test")]
+    partial class Test
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -238,13 +241,6 @@ namespace SklepKsiegarniaMvcUI.Data.Migrations
                         .HasMaxLength(40)
                         .HasColumnType("nvarchar(40)");
 
-                    b.Property<int>("CoverType")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<int>("GenreId")
                         .HasColumnType("int");
 
@@ -255,14 +251,11 @@ namespace SklepKsiegarniaMvcUI.Data.Migrations
                     b.Property<double>("Price")
                         .HasColumnType("float");
 
-                    b.Property<DateTime>("ReleaseDate")
-                        .HasColumnType("datetime2");
-
                     b.HasKey("Id");
 
                     b.HasIndex("GenreId");
 
-                    b.ToTable("Book", (string)null);
+                    b.ToTable("Book");
                 });
 
             modelBuilder.Entity("SklepKsiegarniaMvcUI.Models.CartDetail", b =>
@@ -291,7 +284,7 @@ namespace SklepKsiegarniaMvcUI.Data.Migrations
 
                     b.HasIndex("ShoppingCartId");
 
-                    b.ToTable("CartDetail", (string)null);
+                    b.ToTable("CartDetail");
                 });
 
             modelBuilder.Entity("SklepKsiegarniaMvcUI.Models.Genre", b =>
@@ -309,7 +302,7 @@ namespace SklepKsiegarniaMvcUI.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Genre", (string)null);
+                    b.ToTable("Genre");
                 });
 
             modelBuilder.Entity("SklepKsiegarniaMvcUI.Models.Order", b =>
@@ -337,7 +330,7 @@ namespace SklepKsiegarniaMvcUI.Data.Migrations
 
                     b.HasIndex("OrderStatusId");
 
-                    b.ToTable("Order", (string)null);
+                    b.ToTable("Order");
                 });
 
             modelBuilder.Entity("SklepKsiegarniaMvcUI.Models.OrderDetail", b =>
@@ -366,7 +359,7 @@ namespace SklepKsiegarniaMvcUI.Data.Migrations
 
                     b.HasIndex("OrderId");
 
-                    b.ToTable("OrderDetail", (string)null);
+                    b.ToTable("OrderDetail");
                 });
 
             modelBuilder.Entity("SklepKsiegarniaMvcUI.Models.OrderStatus", b =>
@@ -387,7 +380,7 @@ namespace SklepKsiegarniaMvcUI.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("OrderStatus", (string)null);
+                    b.ToTable("OrderStatus");
                 });
 
             modelBuilder.Entity("SklepKsiegarniaMvcUI.Models.ShoppingCart", b =>
@@ -407,7 +400,7 @@ namespace SklepKsiegarniaMvcUI.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("ShoppingCart", (string)null);
+                    b.ToTable("ShoppingCart");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

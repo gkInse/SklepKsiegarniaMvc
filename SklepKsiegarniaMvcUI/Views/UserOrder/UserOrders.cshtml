@@ -37,7 +37,7 @@
                                     <th>Book</th>
                                     <th>Image</th>
                                     <th>Genre</th>
-                                    <th>Unit Price(INR)</th>
+                                    <th>Unit Price</th>
                                     <th>Total Price</th>
                                 </tr>
                                 @foreach (var item in order.OrderDetail)
@@ -60,8 +60,13 @@
                                         <td>@(item.Book.Price * item.Quantity)</td>
 
                                     </tr>
+
                                 }
                             </table>
+                        <td>
+                            <a class="btn btn-success" href="@Url.Action("RepeatOrder", "Cart", new { orderId = order.Id })">Repeat Order</a>
+                        </td>
+
                     </td>
                 </tr>
                
@@ -73,7 +78,7 @@
      {
             <h5>No Orders</h5>
      }
-</div>
+</div> 
 
 
 
